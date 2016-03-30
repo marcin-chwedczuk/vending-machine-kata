@@ -2,21 +2,25 @@ package tdd.vendingMachine;
 
 public class Product {
     private String name;
-    private int price;
+    private int priceInCents;
 
-    public Product(String name, int price) {
+    public Product(String name, int priceInCents) {
         if (name == null)
             throw new IllegalArgumentException("name cannot be null.");
 
-        if (price <= 0)
-            throw new IllegalArgumentException("price must be a positive number.");
+        if (priceInCents <= 0)
+            throw new IllegalArgumentException("priceInCents must be a positive number.");
 
-        this.price = price;
+        this.priceInCents = priceInCents;
         this.name = name;
     }
 
-    public String getName() {
+    public String name() {
         return name;
+    }
+
+    public int priceInCents() {
+        return priceInCents;
     }
 
     @Override
@@ -25,13 +29,13 @@ public class Product {
         if (o == null || getClass() != o.getClass()) return false;
 
         Product product = (Product) o;
-        return (price == product.price) && name.equals(product.name);
+        return (priceInCents == product.priceInCents) && name.equals(product.name);
     }
 
     @Override
     public int hashCode() {
         int result = name.hashCode();
-        result = 31 * result + price;
+        result = 31 * result + priceInCents;
         return result;
     }
 }

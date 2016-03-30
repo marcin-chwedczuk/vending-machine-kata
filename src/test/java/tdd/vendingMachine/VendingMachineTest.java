@@ -1,6 +1,8 @@
 package tdd.vendingMachine;
 
+import junit.framework.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -15,8 +17,8 @@ public class VendingMachineTest {
     public void before() {
         vendingMachine = new VendingMachine(8);
 
-        sprite = new Product("Sprite", 3);
-        cola = new Product("Cola", 5);
+        sprite = new Product("Sprite", 300);
+        cola = new Product("Cola", 500);
     }
 
     @Test
@@ -75,4 +77,60 @@ public class VendingMachineTest {
             .isEqualTo(10);
     }
 
+    @Test
+    public void vending_machine_has_a_display() {
+        assertThat(vendingMachine.display()).isEmpty();
+    }
+
+    @Test
+    public void after_selecting_shelf_number_display_shows_product_price() {
+        vendingMachine.supplyProductToShelf(3, cola, 10);
+
+        vendingMachine.selectShelf(3);
+
+        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$5.00");
+    }
+
+    @Test
+    public void coins_500_200_100_50_20_10_cents_can_be_put_into_machine() {
+        vendingMachine.putCoin(Coin.CENTS_500);
+        vendingMachine.putCoin(Coin.CENTS_200);
+        vendingMachine.putCoin(Coin.CENTS_100);
+        vendingMachine.putCoin(Coin.CENTS_50);
+        vendingMachine.putCoin(Coin.CENTS_20);
+        vendingMachine.putCoin(Coin.CENTS_10);
+    }
+
+    @Test
+    @Ignore
+    public void coins_1_2_5_cents_cannot_be_used_with_machine() {
+        // TODO:
+    }
+
+    @Test
+    public void after_selection_of_product_when_you_put_coins_into_machine_displays_shows_how_much_is_missing_to_cover_product_price() {
+        vendingMachine.supplyProductToShelf(1, new Product("X", 400), 10);
+        vendingMachine.selectShelf(1);
+
+        vendingMachine.putCoin(Coin.CENTS_10);
+        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$3.90");
+
+        vendingMachine.putCoin(Coin.CENTS_200);
+        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$1.90");
+
+        vendingMachine.putCoin(Coin.CENTS_50);
+        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$1.40");
+    }
+
+    @Test
+    public void when_you_put_more_money_than_product_price_display_shows_zero() {
+        vendingMachine.supplyProductToShelf(1, new Product("X", 400), 10);
+
+        vendingMachine.selectShelf(1);
+        vendingMachine.putCoin(Coin.CENTS_200);
+        vendingMachine.putCoin(Coin.CENTS_50);
+        vendingMachine.putCoin(Coin.CENTS_200);
+
+        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$0.00");
+    }
 }

@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VendingMachine {
+    private CoinsCollector coinsCollector;
     private List<Shelf> shelves;
 
+    private Shelf selectedShelf;
+
     public VendingMachine(int shelvesCount) {
+        coinsCollector = new CoinsCollector();
+
         shelves = new ArrayList<>();
 
         for (int i = 0; i < shelvesCount; i++)
@@ -33,5 +38,34 @@ public class VendingMachine {
                 "invalid shelf number: " + shelfNumber);
 
         return shelves.get(shelfNumber-1);
+    }
+
+    public String display() {
+        if (selectedShelf != null) {
+            int missingMoneyInCents =
+                selectedShelf.productPriceInCents() - coinsCollector.totalMoneyInCents();
+
+            // user paid too much
+            if (missingMoneyInCents < 0)
+                missingMoneyInCents = 0;
+
+            return formatPrice(missingMoneyInCents);
+        }
+
+        return "";
+    }
+
+    private static String formatPrice(int totalCents) {
+        int dollars = totalCents / 100;
+        int cents = totalCents - dollars*100;
+        return String.format("$%d.%02d", dollars, cents);
+    }
+
+    public void selectShelf(int shelfNumber) {
+        selectedShelf = getShelf(shelfNumber);
+    }
+
+    public void putCoin(Coin coin) {
+        coinsCollector.addCoin(coin);
     }
 }

@@ -27,4 +27,8 @@ public class Shelf {
     public int numberOfProductInstances() {
         return this.numberOfProductInstances;
     }
+
+    public int productPriceInCents() {
+        return this.product.priceInCents();
+    }
 }
