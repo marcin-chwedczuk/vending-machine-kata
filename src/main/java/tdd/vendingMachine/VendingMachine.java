@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VendingMachine {
-    private CoinsCollector coinsCollector;
-    private Dispenser<Product> productDispenser;
-    private Dispenser<Coin> coinDispenser;
-
-    private Display display;
-
-    private List<Shelf> shelves;
+    private final MoneyManager moneyManager;
+    private final CoinsCollector coinsCollector;
+    private final Dispenser<Product> productDispenser;
+    private final Dispenser<CoinType> coinDispenser;
+    private final Display display;
+    private final List<Shelf> shelves;
 
     private Shelf selectedShelf;
 
     public VendingMachine(int shelvesCount) {
+        moneyManager = new MoneyManager();
         coinsCollector = new CoinsCollector();
         productDispenser = new Dispenser<>();
         coinDispenser = new Dispenser<>();
@@ -49,28 +49,27 @@ public class VendingMachine {
     }
 
     public String display() {
-        if (selectedShelf != null) {
-            int missingMoneyInCents =
-                selectedShelf.productPriceInCents() - coinsCollector.totalMoneyInCents();
-
-            // user paid too much
-            if (missingMoneyInCents < 0)
-                missingMoneyInCents = 0;
-
+        if (isShelfSelected()) {
+            int missingMoneyInCents = moneyManager.missingMoneyInCents();
             return display.displayMissingMoney(missingMoneyInCents);
         }
 
         return display.displayProductNotSelectedMessage();
     }
 
-    public void selectShelf(int shelfNumber) {
-        selectedShelf = getShelf(shelfNumber);
+    private boolean isShelfSelected() {
+        return (selectedShelf != null);
     }
 
-    public void putCoin(Coin coin) {
-        coinsCollector.addCoin(coin);
+    public void selectShelf(int shelfNumber) {
+        selectedShelf = getShelf(shelfNumber);
+        moneyManager.setProductPrice(selectedShelf.productPriceInCents());
+    }
 
-        if (coinsCollector.totalMoneyInCents() >= selectedShelf.productPriceInCents()) {
+    public void putCoin(CoinType coin) {
+        moneyManager.acceptUserCoin(coin);
+
+        if (isShelfSelected() && moneyManager.userCanBuyProduct()) {
             productDispenser.put(selectedShelf.removeProduct());
         }
     }
@@ -79,7 +78,7 @@ public class VendingMachine {
         return productDispenser.get();
     }
 
-    public void supplyCoins(Coin coin, int count) {
-
+    public void supplyCoins(CoinType coinType, int count) {
+        moneyManager.supplyCoins(coinType, count);
     }
 }

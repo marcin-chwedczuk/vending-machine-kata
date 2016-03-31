@@ -77,8 +77,9 @@ public class VendingMachineTest {
     }
 
     @Test
-    public void vending_machine_has_a_display() {
-        assertThat(vendingMachine.display()).isEmpty();
+    public void display_shows_nothing_when_product_is_not_selected() {
+        assertThat(vendingMachine.display())
+            .isEmpty();
     }
 
     @Test
@@ -87,7 +88,8 @@ public class VendingMachineTest {
 
         vendingMachine.selectShelf(3);
 
-        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$5.00");
+        assertThat(vendingMachine.display())
+            .isEqualToIgnoringCase("$5.00");
     }
 
     @Test
@@ -95,12 +97,12 @@ public class VendingMachineTest {
         vendingMachine.supplyProductToShelf(1, Fixtures.COLA_PRODUCT_TYPE, 100);
         vendingMachine.selectShelf(1);
 
-        vendingMachine.putCoin(Coin.CENTS_500);
-        vendingMachine.putCoin(Coin.CENTS_200);
-        vendingMachine.putCoin(Coin.CENTS_100);
-        vendingMachine.putCoin(Coin.CENTS_50);
-        vendingMachine.putCoin(Coin.CENTS_20);
-        vendingMachine.putCoin(Coin.CENTS_10);
+        vendingMachine.putCoin(CoinType.CENTS_500);
+        vendingMachine.putCoin(CoinType.CENTS_200);
+        vendingMachine.putCoin(CoinType.CENTS_100);
+        vendingMachine.putCoin(CoinType.CENTS_50);
+        vendingMachine.putCoin(CoinType.CENTS_20);
+        vendingMachine.putCoin(CoinType.CENTS_10);
     }
 
     @Test
@@ -114,13 +116,13 @@ public class VendingMachineTest {
         vendingMachine.supplyProductToShelf(1, new ProductType("X", 400), 10);
         vendingMachine.selectShelf(1);
 
-        vendingMachine.putCoin(Coin.CENTS_10);
+        vendingMachine.putCoin(CoinType.CENTS_10);
         assertThat(vendingMachine.display()).isEqualToIgnoringCase("$3.90");
 
-        vendingMachine.putCoin(Coin.CENTS_200);
+        vendingMachine.putCoin(CoinType.CENTS_200);
         assertThat(vendingMachine.display()).isEqualToIgnoringCase("$1.90");
 
-        vendingMachine.putCoin(Coin.CENTS_50);
+        vendingMachine.putCoin(CoinType.CENTS_50);
         assertThat(vendingMachine.display()).isEqualToIgnoringCase("$1.40");
     }
 
@@ -129,11 +131,12 @@ public class VendingMachineTest {
         vendingMachine.supplyProductToShelf(1, new ProductType("X", 400), 10);
 
         vendingMachine.selectShelf(1);
-        vendingMachine.putCoin(Coin.CENTS_200);
-        vendingMachine.putCoin(Coin.CENTS_50);
-        vendingMachine.putCoin(Coin.CENTS_200);
+        vendingMachine.putCoin(CoinType.CENTS_200);
+        vendingMachine.putCoin(CoinType.CENTS_50);
+        vendingMachine.putCoin(CoinType.CENTS_200);
 
-        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$0.00");
+        assertThat(vendingMachine.display())
+            .isEqualToIgnoringCase("$0.00");
     }
 
     @Test
@@ -142,9 +145,12 @@ public class VendingMachineTest {
         vendingMachine.supplyProductToShelf(1, productX, 10);
 
         vendingMachine.selectShelf(1);
-        vendingMachine.putCoin(Coin.CENTS_100);
+        vendingMachine.putCoin(CoinType.CENTS_100);
 
         Product boughtProduct = vendingMachine.getProduct();
+
+        assertThat(boughtProduct)
+            .isNotNull();
 
         assertThat(boughtProduct.productType())
             .isEqualTo(productX);
@@ -152,11 +158,22 @@ public class VendingMachineTest {
 
     @Test
     public void coins_may_be_supplied_to_vending_machine() {
-        vendingMachine.supplyCoins(Coin.CENTS_20, 30);
+        vendingMachine.supplyCoins(CoinType.CENTS_20, 30);
     }
 
     @Test
     public void product_will_be_dispensed_only_if_machine_can_return_the_change() {
+        // machine has only $5 coins
+        vendingMachine.supplyCoins(CoinType.CENTS_500, 10);
 
+        vendingMachine.supplyProductToShelf(1, new ProductType("X", 50), 5);
+        vendingMachine.selectShelf(1);
+
+        vendingMachine.putCoin(CoinType.CENTS_20);
+        vendingMachine.putCoin(CoinType.CENTS_20);
+        vendingMachine.putCoin(CoinType.CENTS_20);
+
+        assertThat(vendingMachine.getProduct())
+            .isNull();
     }
 }

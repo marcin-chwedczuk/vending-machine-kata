@@ -21,15 +21,15 @@ public class CoinsCollectorTest {
 
     @Test
     public void totalMoneyInCents_returns_sum_of_money_in_collector() {
-        coinsCollector.addCoin(Coin.CENTS_20);
+        coinsCollector.addCoin(CoinType.CENTS_20);
         assertThat(coinsCollector.totalMoneyInCents())
             .isEqualTo(20);
 
-        coinsCollector.addCoin(Coin.CENTS_200);
+        coinsCollector.addCoin(CoinType.CENTS_200);
         assertThat(coinsCollector.totalMoneyInCents())
             .isEqualTo(220);
 
-        coinsCollector.addCoin(Coin.CENTS_10);
+        coinsCollector.addCoin(CoinType.CENTS_10);
         assertThat(coinsCollector.totalMoneyInCents())
             .isEqualTo(230);
     }

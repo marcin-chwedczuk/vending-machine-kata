@@ -1,6 +1,6 @@
 package tdd.vendingMachine;
 
-public enum Coin {
+public enum CoinType {
     CENTS_500(500),
     CENTS_200(200),
     CENTS_100(100),
@@ -10,7 +10,7 @@ public enum Coin {
 
     private int valueInCents;
 
-    Coin(int valueInCents) {
+    CoinType(int valueInCents) {
         this.valueInCents = valueInCents;
     }
 
