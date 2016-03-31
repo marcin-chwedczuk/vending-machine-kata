@@ -1,34 +1,53 @@
 package tdd.vendingMachine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Shelf {
-    private Product product;
-    private int numberOfProductInstances;
+    private final List<Product> products = new ArrayList<>();
 
-    public void supplyProduct(Product product, int howMany) {
-        if (isEmpty()) {
-            this.product = product;
-            this.numberOfProductInstances = howMany;
-        }
-        else {
-            if (!this.product.equals(product))
-                throw new VendingMachineException(
-                    "shelf can contain only single type of products, " +
-                    "product on shelf: " + this.product + ", " +
-                    "attempt to add product: " + product);
+    public void supplyProduct(ProductType productType, int howMany) {
+        if (productType == null)
+            throw new NullPointerException("productType must be provided.");
 
-            this.numberOfProductInstances += howMany;
+        if (howMany < 0)
+            throw new IllegalArgumentException("howMany cannot be negative.");
+
+        if (!isEmpty() && !productType.equals(getProductType())) {
+            throw new VendingMachineException(
+                "shelf can contain only single type of products, " +
+                "product on shelf: " + getProductType() + ", " +
+                "attempt to add product: " + productType);
         }
+
+        for (int i = 0; i < howMany; i++) {
+            products.add(productType.createProduct());
+        }
+    }
+
+    private ProductType getProductType() {
+        if (isEmpty())
+            return null;
+
+        return products.get(0).productType();
     }
 
     public boolean isEmpty() {
-        return (numberOfProductInstances == 0);
+        return products.isEmpty();
     }
 
     public int numberOfProductInstances() {
-        return this.numberOfProductInstances;
+        return products.size();
     }
 
     public int productPriceInCents() {
-        return this.product.priceInCents();
+        // TODO: empty shelf
+        return products.get(0).priceInCents();
+    }
+
+    public Product removeProduct() {
+        Product product = products.get(0);
+        products.remove(0);
+        return product;
     }
 }

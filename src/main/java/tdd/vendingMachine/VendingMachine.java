@@ -5,12 +5,20 @@ import java.util.List;
 
 public class VendingMachine {
     private CoinsCollector coinsCollector;
+    private Dispenser<Product> productDispenser;
+    private Dispenser<Coin> coinDispenser;
+
+    private Display display;
+
     private List<Shelf> shelves;
 
     private Shelf selectedShelf;
 
     public VendingMachine(int shelvesCount) {
         coinsCollector = new CoinsCollector();
+        productDispenser = new Dispenser<>();
+        coinDispenser = new Dispenser<>();
+        display = new Display();
 
         shelves = new ArrayList<>();
 
@@ -18,9 +26,9 @@ public class VendingMachine {
             shelves.add(new Shelf());
     }
 
-    public void supplyProductToShelf(int shelfNumber, Product product, int howMany) {
+    public void supplyProductToShelf(int shelfNumber, ProductType productType, int howMany) {
         Shelf shelf = getShelf(shelfNumber);
-        shelf.supplyProduct(product, howMany);
+        shelf.supplyProduct(productType, howMany);
     }
 
     public int shelvesCount() {
@@ -49,16 +57,10 @@ public class VendingMachine {
             if (missingMoneyInCents < 0)
                 missingMoneyInCents = 0;
 
-            return formatPrice(missingMoneyInCents);
+            return display.displayMissingMoney(missingMoneyInCents);
         }
 
-        return "";
-    }
-
-    private static String formatPrice(int totalCents) {
-        int dollars = totalCents / 100;
-        int cents = totalCents - dollars*100;
-        return String.format("$%d.%02d", dollars, cents);
+        return display.displayProductNotSelectedMessage();
     }
 
     public void selectShelf(int shelfNumber) {
@@ -67,5 +69,17 @@ public class VendingMachine {
 
     public void putCoin(Coin coin) {
         coinsCollector.addCoin(coin);
+
+        if (coinsCollector.totalMoneyInCents() >= selectedShelf.productPriceInCents()) {
+            productDispenser.put(selectedShelf.removeProduct());
+        }
+    }
+
+    public Product getProduct() {
+        return productDispenser.get();
+    }
+
+    public void supplyCoins(Coin coin, int count) {
+
     }
 }

@@ -1,41 +1,24 @@
 package tdd.vendingMachine;
 
 public class Product {
-    private String name;
-    private int priceInCents;
+    private final ProductType productType;
 
-    public Product(String name, int priceInCents) {
-        if (name == null)
-            throw new IllegalArgumentException("name cannot be null.");
+    public Product(ProductType productType) {
+        if (productType == null)
+            throw new NullPointerException("productType must be provided.");
 
-        if (priceInCents <= 0)
-            throw new IllegalArgumentException("priceInCents must be a positive number.");
-
-        this.priceInCents = priceInCents;
-        this.name = name;
+        this.productType = productType;
     }
 
     public String name() {
-        return name;
+        return productType.productName();
     }
 
     public int priceInCents() {
-        return priceInCents;
+        return productType.productPriceInCents();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Product product = (Product) o;
-        return (priceInCents == product.priceInCents) && name.equals(product.name);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + priceInCents;
-        return result;
+    public ProductType productType() {
+        return productType;
     }
 }
