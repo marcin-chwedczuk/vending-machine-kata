@@ -5,9 +5,8 @@ import java.util.List;
 
 public class VendingMachine {
     private final MoneyManager moneyManager;
-    private final CoinsCollector coinsCollector;
     private final Dispenser<Product> productDispenser;
-    private final Dispenser<CoinType> coinDispenser;
+    private final Dispenser<CoinType> changeDispenser;
     private final Display display;
     private final List<Shelf> shelves;
 
@@ -15,15 +14,18 @@ public class VendingMachine {
 
     public VendingMachine(int shelvesCount) {
         moneyManager = new MoneyManager();
-        coinsCollector = new CoinsCollector();
         productDispenser = new Dispenser<>();
-        coinDispenser = new Dispenser<>();
+        changeDispenser = new Dispenser<>();
         display = new Display();
 
         shelves = new ArrayList<>();
 
         for (int i = 0; i < shelvesCount; i++)
             shelves.add(new Shelf());
+    }
+
+    private void resetSelectedShelf() {
+        selectedShelf = null;
     }
 
     public void supplyProductToShelf(int shelfNumber, ProductType productType, int howMany) {
@@ -70,15 +72,22 @@ public class VendingMachine {
         moneyManager.acceptUserCoin(coin);
 
         if (isShelfSelected() && moneyManager.userCanBuyProduct()) {
+            List<CoinType> change = moneyManager.buyProduct();
+            changeDispenser.putAll(change);
             productDispenser.put(selectedShelf.removeProduct());
+            resetSelectedShelf();
         }
     }
 
-    public Product getProduct() {
+    public Product releaseProduct() {
         return productDispenser.get();
     }
 
     public void supplyCoins(CoinType coinType, int count) {
         moneyManager.supplyCoins(coinType, count);
+    }
+
+    public List<CoinType> releaseChange() {
+        return changeDispenser.getAll();
     }
 }

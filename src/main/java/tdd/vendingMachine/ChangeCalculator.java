@@ -3,10 +3,10 @@ package tdd.vendingMachine;
 import java.util.*;
 
 public class ChangeCalculator {
-    private final CoinsCollector machineCoins;
-    private final CoinsCollector userCoins;
+    private final CoinStore machineCoins;
+    private final CoinStore userCoins;
 
-    public ChangeCalculator(CoinsCollector machineCoins, CoinsCollector userCoins) {
+    public ChangeCalculator(CoinStore machineCoins, CoinStore userCoins) {
         this.machineCoins = machineCoins;
         this.userCoins = userCoins;
     }

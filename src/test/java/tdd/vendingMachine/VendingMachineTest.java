@@ -127,19 +127,6 @@ public class VendingMachineTest {
     }
 
     @Test
-    public void when_you_put_more_money_than_product_price_display_shows_zero() {
-        vendingMachine.supplyProductToShelf(1, new ProductType("X", 400), 10);
-
-        vendingMachine.selectShelf(1);
-        vendingMachine.putCoin(CoinType.CENTS_200);
-        vendingMachine.putCoin(CoinType.CENTS_50);
-        vendingMachine.putCoin(CoinType.CENTS_200);
-
-        assertThat(vendingMachine.display())
-            .isEqualToIgnoringCase("$0.00");
-    }
-
-    @Test
     public void after_you_put_enough_money_to_buy_a_product_machine_dispenses_product() {
         ProductType productX = new ProductType("X", 100);
         vendingMachine.supplyProductToShelf(1, productX, 10);
@@ -147,7 +134,7 @@ public class VendingMachineTest {
         vendingMachine.selectShelf(1);
         vendingMachine.putCoin(CoinType.CENTS_100);
 
-        Product boughtProduct = vendingMachine.getProduct();
+        Product boughtProduct = vendingMachine.releaseProduct();
 
         assertThat(boughtProduct)
             .isNotNull();
@@ -173,7 +160,45 @@ public class VendingMachineTest {
         vendingMachine.putCoin(CoinType.CENTS_20);
         vendingMachine.putCoin(CoinType.CENTS_20);
 
-        assertThat(vendingMachine.getProduct())
+        assertThat(vendingMachine.releaseProduct())
+            .isNull();
+    }
+
+    @Test
+    public void when_you_put_to_much_money_in_the_machine_machine_returns_product_and_change() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+
+        vendingMachine.supplyCoins(CoinType.CENTS_50, 10);
+        vendingMachine.supplyCoins(CoinType.CENTS_10, 3);
+
+        vendingMachine.putCoin(CoinType.CENTS_500);
+
+        assertThat(vendingMachine.releaseProduct())
+            .isNotNull();
+
+        // $5 = $3.2 + $0.5*3 + $0.1*3
+        assertThat(vendingMachine.releaseChange())
+            .containsExactly(CoinType.CENTS_50, CoinType.CENTS_50, CoinType.CENTS_50,
+                CoinType.CENTS_10, CoinType.CENTS_10, CoinType.CENTS_10);
+    }
+
+    @Test
+    public void machine_returns_change_only_after_you_buy_product() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+
+        vendingMachine.supplyCoins(CoinType.CENTS_50, 10);
+        vendingMachine.supplyCoins(CoinType.CENTS_10, 10);
+
+        assertThat(vendingMachine.releaseChange())
+            .isNull();
+
+        vendingMachine.putCoin(CoinType.CENTS_200);
+        vendingMachine.putCoin(CoinType.CENTS_200);
+
+        vendingMachine.releaseChange();
+        vendingMachine.releaseProduct();
+
+        assertThat(vendingMachine.releaseChange())
             .isNull();
     }
 }

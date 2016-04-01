@@ -1,26 +1,28 @@
 package tdd.vendingMachine;
 
+import java.util.List;
+
 public class MoneyManager {
-    private final CoinsCollector userCoins;
-    private final CoinsCollector machineCoins;
+    private final CoinStore userCoinStore;
+    private final CoinStore machineCoinStore;
     private final ChangeCalculator changeCalculator;
 
     private int productPriceInCents;
 
     public MoneyManager() {
-        userCoins = new CoinsCollector();
-        machineCoins = new CoinsCollector();
-        changeCalculator = new ChangeCalculator(machineCoins, userCoins);
+        userCoinStore = new CoinStore();
+        machineCoinStore = new CoinStore();
+        changeCalculator = new ChangeCalculator(machineCoinStore, userCoinStore);
 
         productPriceInCents = 0;
     }
 
     public void supplyCoins(CoinType coinType, int coinsCount) {
-        machineCoins.addCoins(coinType, coinsCount);
+        machineCoinStore.addCoins(coinType, coinsCount);
     }
 
     public void acceptUserCoin(CoinType coinType) {
-        userCoins.addCoin(coinType);
+        userCoinStore.addCoin(coinType);
     }
 
     public void setProductPrice(int productPriceInCents) {
@@ -32,7 +34,7 @@ public class MoneyManager {
     }
 
     public int missingMoneyInCents() {
-        int missingMoneyInCents = productPriceInCents - userCoins.totalMoneyInCents();
+        int missingMoneyInCents = productPriceInCents - userCoinStore.totalMoneyInCents();
 
         // user paid too much
         if (missingMoneyInCents < 0)
@@ -42,7 +44,7 @@ public class MoneyManager {
     }
 
     private int changeInCents() {
-        int changeInCents = userCoins.totalMoneyInCents() - productPriceInCents;
+        int changeInCents = userCoinStore.totalMoneyInCents() - productPriceInCents;
 
         if (changeInCents < 0)
             changeInCents = 0;
@@ -63,5 +65,17 @@ public class MoneyManager {
 
     private boolean canReturnChange() {
         return changeCalculator.canReturnChange(changeInCents());
+    }
+
+    public List<CoinType> buyProduct() {
+        if (!userCanBuyProduct())
+            throw new IllegalStateException("user cannot buy product.");
+
+        List<CoinType> change = changeCalculator.getChange(changeInCents());
+
+        userCoinStore.transferCoinsTo(machineCoinStore);
+        machineCoinStore.removeCoins(change);
+
+        return change;
     }
 }

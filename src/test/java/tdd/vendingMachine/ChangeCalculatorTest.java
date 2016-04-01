@@ -10,8 +10,8 @@ public class ChangeCalculatorTest {
 
     @Before
     public void before() {
-        CoinsCollector machineCoins = new CoinsCollector();
-        CoinsCollector userCoins = new CoinsCollector();
+        CoinStore machineCoins = new CoinStore();
+        CoinStore userCoins = new CoinStore();
 
         machineCoins
             .addCoins(CoinType.CENTS_100, 3)

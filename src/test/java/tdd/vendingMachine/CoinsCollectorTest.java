@@ -6,11 +6,11 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class CoinsCollectorTest {
-    private CoinsCollector coinsCollector;
+    private CoinStore coinsCollector;
 
     @Before
     public void before() {
-        coinsCollector = new CoinsCollector();
+        coinsCollector = new CoinStore();
     }
 
     @Test
