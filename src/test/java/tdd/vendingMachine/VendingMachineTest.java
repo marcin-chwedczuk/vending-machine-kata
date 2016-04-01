@@ -78,7 +78,7 @@ public class VendingMachineTest {
 
     @Test
     public void display_shows_nothing_when_product_is_not_selected() {
-        assertThat(vendingMachine.display())
+        assertThat(vendingMachine.displayContents())
             .isEmpty();
     }
 
@@ -88,7 +88,7 @@ public class VendingMachineTest {
 
         vendingMachine.selectShelf(3);
 
-        assertThat(vendingMachine.display())
+        assertThat(vendingMachine.displayContents())
             .isEqualToIgnoringCase("$5.00");
     }
 
@@ -117,13 +117,13 @@ public class VendingMachineTest {
         vendingMachine.selectShelf(1);
 
         vendingMachine.putCoin(CoinType.CENTS_10);
-        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$3.90");
+        assertThat(vendingMachine.displayContents()).isEqualToIgnoringCase("$3.90");
 
         vendingMachine.putCoin(CoinType.CENTS_200);
-        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$1.90");
+        assertThat(vendingMachine.displayContents()).isEqualToIgnoringCase("$1.90");
 
         vendingMachine.putCoin(CoinType.CENTS_50);
-        assertThat(vendingMachine.display()).isEqualToIgnoringCase("$1.40");
+        assertThat(vendingMachine.displayContents()).isEqualToIgnoringCase("$1.40");
     }
 
     @Test
@@ -149,7 +149,7 @@ public class VendingMachineTest {
     }
 
     @Test
-    public void product_will_be_dispensed_only_if_machine_can_return_the_change() {
+    public void when_machine_cannot_return_change_it_will_not_release_product_and_it_will_return_user_money_and_display_warning() {
         // machine has only $5 coins
         vendingMachine.supplyCoins(CoinType.CENTS_500, 10);
 
@@ -162,6 +162,12 @@ public class VendingMachineTest {
 
         assertThat(vendingMachine.releaseProduct())
             .isNull();
+
+        assertThat(vendingMachine.displayContents())
+            .isEqualToIgnoringCase("cannot return change");
+
+        assertThat(vendingMachine.releaseChange())
+            .containsExactly(CoinType.CENTS_20, CoinType.CENTS_20, CoinType.CENTS_20);
     }
 
     @Test
@@ -197,6 +203,25 @@ public class VendingMachineTest {
 
         vendingMachine.releaseChange();
         vendingMachine.releaseProduct();
+
+        assertThat(vendingMachine.releaseChange())
+            .isNull();
+    }
+
+    @Test
+    public void user_can_press_cancel_to_get_her_money_back() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+
+        vendingMachine.putCoin(CoinType.CENTS_100);
+        vendingMachine.putCoin(CoinType.CENTS_200);
+
+        assertThat(vendingMachine.releaseChange())
+            .isNull();
+
+        vendingMachine.cancelOrder();
+
+        assertThat(vendingMachine.releaseChange())
+            .containsExactly(CoinType.CENTS_200, CoinType.CENTS_100);
 
         assertThat(vendingMachine.releaseChange())
             .isNull();

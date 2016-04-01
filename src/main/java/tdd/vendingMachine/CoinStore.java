@@ -1,8 +1,11 @@
 package tdd.vendingMachine;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class CoinStore {
     private final Map<CoinType, Integer> coinsCounts = new HashMap<>();
@@ -64,4 +67,11 @@ public class CoinStore {
         coinsCounts.clear();
     }
 
+    public List<CoinType> giveMoneyBack() {
+        List<CoinType> userCoins = coinsCounts.entrySet().stream()
+            .flatMap(e -> Collections.nCopies(e.getValue(), e.getKey()).stream())
+            .collect(Collectors.toList());
+
+        return userCoins;
+    }
 }

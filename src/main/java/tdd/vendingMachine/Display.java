@@ -1,17 +1,33 @@
 package tdd.vendingMachine;
 
 public class Display {
-    public String displayMissingMoney(int missingMoneyInCents) {
-        return formatPrice(missingMoneyInCents);
+    private String contents;
+
+    public String contents() {
+        return contents;
+    }
+
+    public void displayMissingMoney(int missingMoneyInCents) {
+        contents = formatPrice(missingMoneyInCents);
+    }
+
+    public void showProductPrice(int productPriceInCents) {
+        contents = formatPrice(productPriceInCents);
+    }
+
+    public void displayProductNotSelectedMessage() {
+        contents = "";
+    }
+
+    public void displayCannotReturnChangeWarning() {
+        contents = "Cannot return change";
     }
 
     private static String formatPrice(int totalCents) {
-        int dollars = totalCents / 100;
-        int cents = totalCents - dollars*100;
-        return String.format("$%d.%02d", dollars, cents);
-    }
+        final int CENTS_PER_DOLLAR = 100;
 
-    public String displayProductNotSelectedMessage() {
-        return "";
+        int dollars = totalCents / CENTS_PER_DOLLAR;
+        int cents = totalCents - dollars*CENTS_PER_DOLLAR;
+        return String.format("$%d.%02d", dollars, cents);
     }
 }

@@ -63,7 +63,7 @@ public class MoneyManager {
         return true;
     }
 
-    private boolean canReturnChange() {
+    public boolean canReturnChange() {
         return changeCalculator.canReturnChange(changeInCents());
     }
 
@@ -77,5 +77,9 @@ public class MoneyManager {
         machineCoinStore.removeCoins(change);
 
         return change;
+    }
+
+    public List<CoinType> giveUserMoneyBack() {
+        return userCoinStore.giveMoneyBack();
     }
 }
