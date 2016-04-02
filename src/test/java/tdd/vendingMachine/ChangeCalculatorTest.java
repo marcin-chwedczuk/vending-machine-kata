@@ -48,4 +48,16 @@ public class ChangeCalculatorTest {
         assertThat(changeCalculator.getChange(900))
             .isNull();
     }
+
+    @Test
+    public void bug1_simple_algorithm_not_works() {
+        CoinStore machineCoins = new CoinStore();
+        machineCoins.addCoin(CoinType.CENTS_50);
+        machineCoins.addCoins(CoinType.CENTS_20, 3);
+
+        ChangeCalculator changeCalculator = new ChangeCalculator(machineCoins, new CoinStore());
+
+        assertThat(changeCalculator.getChange(60))
+            .containsExactly(CoinType.CENTS_20, CoinType.CENTS_20, CoinType.CENTS_20);
+    }
 }

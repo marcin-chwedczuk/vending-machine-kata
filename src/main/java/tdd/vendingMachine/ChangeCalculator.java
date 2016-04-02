@@ -1,6 +1,8 @@
 package tdd.vendingMachine;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ChangeCalculator {
     private final CoinStore machineCoins;
@@ -12,22 +14,28 @@ public class ChangeCalculator {
     }
 
     public List<CoinType> getChange(int changeInCents) {
-        List<CoinType> change = new ArrayList<>();
+        if (changeInCents == 0)
+            return new ArrayList<>();
 
-        for(CoinType coin : getCoinsInDescendingOrder()) {
-            int availableCoins = machineCoins.numberOfCoins(coin) + userCoins.numberOfCoins(coin);
+        Map<CoinType, Integer> counts = Arrays.asList(CoinType.values())
+            .stream()
+            .collect(Collectors.toMap(
+                coin -> coin,
+                coin -> machineCoins.numberOfCoins(coin) + userCoins.numberOfCoins(coin)));
 
-            while (changeInCents >= coin.valueInCents() && availableCoins > 0) {
-                change.add(coin);
-                availableCoins--;
-                changeInCents -= coin.valueInCents();
-            }
-        }
+        ComputeChangeAlgorithm algorithm = new ComputeChangeAlgorithm(counts, changeInCents);
 
-        if (changeInCents > 0)
+        Map<CoinType, Integer> change = algorithm.getChange();
+        if (change == null)
             return null;
 
-        return change;
+        //noinspection UnnecessaryLocalVariable
+        List<CoinType> listOfCoins = change.entrySet().stream()
+            .flatMap(e -> Collections.nCopies(e.getValue(), e.getKey()).stream())
+            .sorted((a, b) -> -Integer.compare(a.valueInCents(), b.valueInCents()))
+            .collect(Collectors.toList());
+
+        return listOfCoins;
     }
 
     public boolean canReturnChange(int changeInCents) {
