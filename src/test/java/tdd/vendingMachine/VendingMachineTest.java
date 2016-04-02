@@ -165,7 +165,7 @@ public class VendingMachineTest {
 
     @Test
     public void when_you_put_to_much_money_in_the_machine_machine_returns_product_and_change() {
-        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1AndSelf1Selected();
 
         vendingMachine.supplyCoins(CoinType.CENTS_50, 10);
         vendingMachine.supplyCoins(CoinType.CENTS_10, 3);
@@ -183,7 +183,7 @@ public class VendingMachineTest {
 
     @Test
     public void machine_returns_change_only_after_you_buy_product() {
-        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1AndSelf1Selected();
 
         vendingMachine.supplyCoins(CoinType.CENTS_50, 10);
         vendingMachine.supplyCoins(CoinType.CENTS_10, 10);
@@ -203,7 +203,7 @@ public class VendingMachineTest {
 
     @Test
     public void user_can_press_cancel_to_get_his_money_back() {
-        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1AndSelf1Selected();
 
         vendingMachine.putCoin(CoinType.CENTS_100);
         vendingMachine.putCoin(CoinType.CENTS_200);
@@ -222,7 +222,7 @@ public class VendingMachineTest {
 
     @Test
     public void when_user_press_cancel_product_is_not_dispensed() {
-        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1AndSelf1Selected();
 
         vendingMachine.putCoin(CoinType.CENTS_100);
         vendingMachine.putCoin(CoinType.CENTS_200);
@@ -258,5 +258,22 @@ public class VendingMachineTest {
         // check shelf not selected
         assertThat(vendingMachine.displayContents())
             .isEqualToIgnoringCase("");
+    }
+
+    @Test
+    public void after_cancel_money_were_returned_to_user() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1AndSelf1Selected();
+
+        vendingMachine.putCoin(CoinType.CENTS_100);
+        vendingMachine.putCoin(CoinType.CENTS_200);
+
+        vendingMachine.cancelOrder();
+        vendingMachine.returnChange();
+
+        vendingMachine.selectShelf(1);
+        vendingMachine.putCoin(CoinType.CENTS_20);
+
+        assertThat(vendingMachine.getPurchasedProduct())
+            .isNull();
     }
 }

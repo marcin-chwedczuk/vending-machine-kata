@@ -72,6 +72,8 @@ public class CoinStore {
             .flatMap(e -> Collections.nCopies(e.getValue(), e.getKey()).stream())
             .collect(Collectors.toList());
 
+        coinsCounts.clear();
+        
         return userCoins;
     }
 }

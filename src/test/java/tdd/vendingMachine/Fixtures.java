@@ -22,7 +22,7 @@ public final class Fixtures {
         return vendingMachine;
     }
 
-    public static VendingMachine getMachineWithColaCosting320AndPreselectedShelf() {
+    public static VendingMachine getMachineWithColaCosting320OnShelf1AndSelf1Selected() {
         VendingMachine vendingMachine = getMachineWithColaCosting320OnShelf1();
 
         vendingMachine.selectShelf(1);
