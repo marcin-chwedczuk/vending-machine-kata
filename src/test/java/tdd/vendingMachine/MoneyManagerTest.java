@@ -19,6 +19,6 @@ public class MoneyManagerTest {
 
     @Test
     public void product_price_may_be_set() {
-        moneyManager.setProductPrice(200);
+        moneyManager.setProductPriceInCents(200);
     }
 }

@@ -14,10 +14,17 @@ public final class Fixtures {
         return SPRITE_PRODUCT_TYPE.createProduct();
     }
 
-    public static VendingMachine getMachineWithColaCosting320AndPreselectedShelf() {
+    public static VendingMachine getMachineWithColaCosting320OnShelf1() {
         VendingMachine vendingMachine = new VendingMachine(8);
 
         vendingMachine.supplyProductToShelf(1, COLA_PRODUCT_TYPE, 10);
+
+        return vendingMachine;
+    }
+
+    public static VendingMachine getMachineWithColaCosting320AndPreselectedShelf() {
+        VendingMachine vendingMachine = getMachineWithColaCosting320OnShelf1();
+
         vendingMachine.selectShelf(1);
 
         return vendingMachine;

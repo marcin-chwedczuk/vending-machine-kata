@@ -7,19 +7,15 @@ public class Display {
         return contents;
     }
 
-    public void displayMissingMoney(int missingMoneyInCents) {
+    public void showMissingMoney(int missingMoneyInCents) {
         contents = formatPrice(missingMoneyInCents);
     }
 
-    public void showProductPrice(int productPriceInCents) {
-        contents = formatPrice(productPriceInCents);
-    }
-
-    public void displayProductNotSelectedMessage() {
+    public void showProductNotSelectedMessage() {
         contents = "";
     }
 
-    public void displayCannotReturnChangeWarning() {
+    public void showCannotReturnChangeWarning() {
         contents = "Cannot return change";
     }
 

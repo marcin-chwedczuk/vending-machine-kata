@@ -26,17 +26,6 @@ public class VendingMachine {
         resetSelectedShelf();
     }
 
-    private void resetSelectedShelf() {
-        selectedShelf = null;
-        moneyManager.setProductPrice(0);
-        display.displayProductNotSelectedMessage();
-    }
-
-    public void supplyProductToShelf(int shelfNumber, ProductType productType, int howMany) {
-        Shelf shelf = getShelf(shelfNumber);
-        shelf.supplyProduct(productType, howMany);
-    }
-
     public int shelvesCount() {
         return shelves.size();
     }
@@ -44,6 +33,11 @@ public class VendingMachine {
     public int numberOfProductInstancesOnShelf(int shelfNumber) {
         Shelf shelf = getShelf(shelfNumber);
         return shelf.numberOfProductInstances();
+    }
+
+    public void supplyProductToShelf(int shelfNumber, ProductType productType, int howMany) {
+        Shelf shelf = getShelf(shelfNumber);
+        shelf.supplyProduct(productType, howMany);
     }
 
     private Shelf getShelf(int shelfNumber) {
@@ -54,39 +48,49 @@ public class VendingMachine {
         return shelves.get(shelfNumber-1);
     }
 
-    public String displayContents() {
-        if (isShelfSelected()) {
-            int missingMoneyInCents = moneyManager.missingMoneyInCents();
-            display.displayMissingMoney(missingMoneyInCents);
-        }
-
-        return display.contents();
-    }
-
     private boolean isShelfSelected() {
         return (selectedShelf != null);
     }
 
     public void selectShelf(int shelfNumber) {
-        selectedShelf = getShelf(shelfNumber);
-        moneyManager.setProductPrice(selectedShelf.productPriceInCents());
-        display.showProductPrice(selectedShelf.productPriceInCents());
+        Shelf self = getShelf(shelfNumber);
+        if (self.isEmpty())
+            return;
+
+        selectedShelf = self;
+        moneyManager.setProductPriceInCents(selectedShelf.productPriceInCents());
+        updateMachineState();
     }
 
-    public void putCoin(CoinType coin) {
-        moneyManager.acceptUserCoin(coin);
+    private void resetSelectedShelf() {
+        selectedShelf = null;
+        moneyManager.setProductPriceInCents(0);
+        display.showProductNotSelectedMessage();
+    }
 
-        if (isShelfSelected()) {
-            if (moneyManager.userCanBuyProduct()) {
-                buyProduct();
-            }
-            else if (moneyManager.missingMoneyInCents() == 0 && !moneyManager.canReturnChange()) {
-                cancelOrder();
-                display.displayCannotReturnChangeWarning();
-            }
-            else {
-                display.displayMissingMoney(moneyManager.missingMoneyInCents());
-            }
+    public String displayContents() {
+        return display.contents();
+    }
+
+    public VendingMachine putCoin(CoinType coin) {
+        moneyManager.acceptUserCoin(coin);
+        updateMachineState();
+        return this;
+    }
+
+    private void updateMachineState() {
+        if (!isShelfSelected())
+            return;
+
+        if (moneyManager.userCanBuyProduct()) {
+            buyProduct();
+        }
+        else if (moneyManager.missingMoneyInCents() == 0 && !moneyManager.canReturnChange()) {
+            cancelOrder();
+            display.showCannotReturnChangeWarning();
+        }
+        else {
+            display.showMissingMoney(moneyManager.missingMoneyInCents());
         }
     }
 
@@ -97,22 +101,22 @@ public class VendingMachine {
         resetSelectedShelf();
     }
 
-    public Product releaseProduct() {
-        return productDispenser.get();
-    }
-
-    public void supplyCoins(CoinType coinType, int count) {
-        moneyManager.supplyCoins(coinType, count);
-    }
-
-    public List<CoinType> releaseChange() {
-        return changeDispenser.getAll();
-    }
-
     public void cancelOrder() {
         List<CoinType> userMoney = moneyManager.giveUserMoneyBack();
         changeDispenser.putAll(userMoney);
 
         resetSelectedShelf();
+    }
+
+    public Product getPurchasedProduct() {
+        return productDispenser.get();
+    }
+
+    public List<CoinType> returnChange() {
+        return changeDispenser.getAll();
+    }
+
+    public void supplyCoins(CoinType coinType, int count) {
+        moneyManager.supplyCoins(coinType, count);
     }
 }

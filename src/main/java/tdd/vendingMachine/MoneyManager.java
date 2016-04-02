@@ -25,7 +25,7 @@ public class MoneyManager {
         userCoinStore.addCoin(coinType);
     }
 
-    public void setProductPrice(int productPriceInCents) {
+    public void setProductPriceInCents(int productPriceInCents) {
         this.productPriceInCents = productPriceInCents;
     }
 
@@ -56,6 +56,7 @@ public class MoneyManager {
         if (missingMoneyInCents() > 0)
             return false;
 
+        //noinspection RedundantIfStatement
         if (changeInCents() > 0 && !canReturnChange()) {
             return false;
         }

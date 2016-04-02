@@ -1,7 +1,6 @@
 package tdd.vendingMachine;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -106,12 +105,6 @@ public class VendingMachineTest {
     }
 
     @Test
-    @Ignore
-    public void coins_1_2_5_cents_cannot_be_used_with_machine() {
-        // TODO:
-    }
-
-    @Test
     public void after_selection_of_product_when_you_put_coins_into_machine_displays_shows_how_much_is_missing_to_cover_product_price() {
         vendingMachine.supplyProductToShelf(1, new ProductType("X", 400), 10);
         vendingMachine.selectShelf(1);
@@ -134,7 +127,7 @@ public class VendingMachineTest {
         vendingMachine.selectShelf(1);
         vendingMachine.putCoin(CoinType.CENTS_100);
 
-        Product boughtProduct = vendingMachine.releaseProduct();
+        Product boughtProduct = vendingMachine.getPurchasedProduct();
 
         assertThat(boughtProduct)
             .isNotNull();
@@ -160,13 +153,13 @@ public class VendingMachineTest {
         vendingMachine.putCoin(CoinType.CENTS_20);
         vendingMachine.putCoin(CoinType.CENTS_20);
 
-        assertThat(vendingMachine.releaseProduct())
+        assertThat(vendingMachine.getPurchasedProduct())
             .isNull();
 
         assertThat(vendingMachine.displayContents())
             .isEqualToIgnoringCase("cannot return change");
 
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .containsExactly(CoinType.CENTS_20, CoinType.CENTS_20, CoinType.CENTS_20);
     }
 
@@ -179,11 +172,11 @@ public class VendingMachineTest {
 
         vendingMachine.putCoin(CoinType.CENTS_500);
 
-        assertThat(vendingMachine.releaseProduct())
+        assertThat(vendingMachine.getPurchasedProduct())
             .isNotNull();
 
         // $5 = $3.2 + $0.5*3 + $0.1*3
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .containsExactly(CoinType.CENTS_50, CoinType.CENTS_50, CoinType.CENTS_50,
                 CoinType.CENTS_10, CoinType.CENTS_10, CoinType.CENTS_10);
     }
@@ -195,35 +188,75 @@ public class VendingMachineTest {
         vendingMachine.supplyCoins(CoinType.CENTS_50, 10);
         vendingMachine.supplyCoins(CoinType.CENTS_10, 10);
 
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .isNull();
 
         vendingMachine.putCoin(CoinType.CENTS_200);
         vendingMachine.putCoin(CoinType.CENTS_200);
 
-        vendingMachine.releaseChange();
-        vendingMachine.releaseProduct();
+        vendingMachine.returnChange();
+        vendingMachine.getPurchasedProduct();
 
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .isNull();
     }
 
     @Test
-    public void user_can_press_cancel_to_get_her_money_back() {
+    public void user_can_press_cancel_to_get_his_money_back() {
         VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
 
         vendingMachine.putCoin(CoinType.CENTS_100);
         vendingMachine.putCoin(CoinType.CENTS_200);
 
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .isNull();
 
         vendingMachine.cancelOrder();
 
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .containsExactly(CoinType.CENTS_200, CoinType.CENTS_100);
 
-        assertThat(vendingMachine.releaseChange())
+        assertThat(vendingMachine.returnChange())
             .isNull();
+    }
+
+    @Test
+    public void when_user_press_cancel_product_is_not_dispensed() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320AndPreselectedShelf();
+
+        vendingMachine.putCoin(CoinType.CENTS_100);
+        vendingMachine.putCoin(CoinType.CENTS_200);
+
+        vendingMachine.cancelOrder();
+
+        assertThat(vendingMachine.getPurchasedProduct())
+            .isNull();
+    }
+
+    @Test
+    public void user_can_buy_product_by_first_putting_coins_then_selecting_shelf() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1();
+
+        vendingMachine
+            .putCoin(CoinType.CENTS_200)
+            .putCoin(CoinType.CENTS_100)
+            .putCoin(CoinType.CENTS_20);
+
+        vendingMachine.selectShelf(1);
+
+        assertThat(vendingMachine.getPurchasedProduct())
+            .isNotNull();
+    }
+
+    @Test
+    public void shelf_without_product_cannot_be_selected() {
+        VendingMachine vendingMachine = Fixtures.getMachineWithColaCosting320OnShelf1();
+
+        vendingMachine.selectShelf(2);
+        vendingMachine.putCoin(CoinType.CENTS_20);
+
+        // check shelf not selected
+        assertThat(vendingMachine.displayContents())
+            .isEqualToIgnoringCase("");
     }
 }

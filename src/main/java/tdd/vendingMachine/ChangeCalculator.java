@@ -41,16 +41,4 @@ public class ChangeCalculator {
     public boolean canReturnChange(int changeInCents) {
         return getChange(changeInCents) != null;
     }
-
-    private CoinType[] getCoinsInDescendingOrder() {
-        CoinType[] coinTypes = CoinType.values();
-
-        Arrays.sort(coinTypes, (o1, o2) -> {
-            // coin with greater values goes first
-            return -Integer.compare(o1.valueInCents(), o2.valueInCents());
-        });
-
-        return coinTypes;
-    }
-
 }

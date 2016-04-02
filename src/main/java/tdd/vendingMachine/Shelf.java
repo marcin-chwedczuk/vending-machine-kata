@@ -41,7 +41,9 @@ public class Shelf {
     }
 
     public int productPriceInCents() {
-        // TODO: empty shelf
+        if (this.isEmpty())
+            throw new IllegalStateException("shelf has no product on it");
+
         return products.get(0).priceInCents();
     }
 
